@@ -68,8 +68,8 @@ class State {
 
     State nextState(Action action){
 
-//        Position position = determinePosition(takingActionChances.get(action).next());
-        Position position = determinePosition(action);
+        Position position = determinePosition(takingActionChances.get(action).next());
+//        Position position = determinePosition(action);
 
         return isValidPosition(position) ? new State(position) : this;
     }
