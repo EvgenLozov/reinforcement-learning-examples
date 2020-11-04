@@ -1,6 +1,9 @@
 package com.example.gridworld;
 
 import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 class State {
 
@@ -11,6 +14,9 @@ class State {
     static final int COLUMNS = 4;
 
     private final Position currentPosition;
+    private boolean deterministic = false;
+
+    private EnumMap<Action, RandomCollection<Action>> takingActionChances;
 
     static State startState(){
         return new State(2, 0);
@@ -22,6 +28,32 @@ class State {
 
     private State(Position position){
         this.currentPosition = position;
+
+        takingActionChances = new EnumMap<>(Action.class);
+
+        RandomCollection<Action> up = new RandomCollection<>();
+        up.add(0.8, Action.UP);
+        up.add(0.1, Action.RIGHT);
+        up.add(0.1, Action.LEFT);
+        takingActionChances.put(Action.UP, up);
+
+        RandomCollection<Action> down = new RandomCollection<>();
+        down.add(0.8, Action.DOWN);
+        down.add(0.1, Action.RIGHT);
+        down.add(0.1, Action.LEFT);
+        takingActionChances.put(Action.DOWN, down);
+
+        RandomCollection<Action> left = new RandomCollection<>();
+        left.add(0.8, Action.LEFT);
+        left.add(0.1, Action.UP);
+        left.add(0.1, Action.DOWN);
+        takingActionChances.put(Action.LEFT, left);
+
+        RandomCollection<Action> right = new RandomCollection<>();
+        right.add(0.8, Action.RIGHT);
+        right.add(0.1, Action.UP);
+        right.add(0.1, Action.DOWN);
+        takingActionChances.put(Action.RIGHT, right);
     }
 
     int giveReward(){
@@ -36,30 +68,30 @@ class State {
 
     State nextState(Action action){
 
-        Position position;
+//        Position position = determinePosition(takingActionChances.get(action).next());
+        Position position = determinePosition(action);
+
+        return isValidPosition(position) ? new State(position) : this;
+    }
+
+    private Position determinePosition(Action action) {
         switch (action){
             case UP: {
-                position = new Position(currentPosition.row - 1, currentPosition.column);
-                break;
+                return new Position(currentPosition.row - 1, currentPosition.column);
             }
             case DOWN:{
-                position = new Position(currentPosition.row + 1, currentPosition.column);
-                break;
+                return new Position(currentPosition.row + 1, currentPosition.column);
             }
             case LEFT:{
-                position = new Position(currentPosition.row , currentPosition.column - 1);
-                break;
+                return new Position(currentPosition.row , currentPosition.column - 1);
             }
             case RIGHT: {
-                position = new Position(currentPosition.row , currentPosition.column + 1);
-                break;
+                return new Position(currentPosition.row , currentPosition.column + 1);
             }
             default: {
                 throw new IllegalArgumentException();
             }
         }
-
-        return isValidPosition(position) ? new State(position) : this;
     }
 
     boolean isGameOver(){
@@ -113,5 +145,15 @@ class State {
             result = 31 * result + column;
             return result;
         }
+
+        @Override
+        public String toString() {
+            return "(" + row + ", " + column + ")";
+        }
+    }
+
+    @Override
+    public String toString() {
+        return currentPosition.toString();
     }
 }
