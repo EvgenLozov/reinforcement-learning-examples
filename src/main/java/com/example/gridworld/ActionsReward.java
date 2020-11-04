@@ -1,13 +1,12 @@
 package com.example.gridworld;
 
-import java.util.Comparator;
 import java.util.Map;
 
 class ActionsReward {
 
     Map<Action, Double> actionsRewards;
 
-    public ActionsReward(Map<Action, Double> actionsRewards) {
+    ActionsReward(Map<Action, Double> actionsRewards) {
         this.actionsRewards = actionsRewards;
     }
 

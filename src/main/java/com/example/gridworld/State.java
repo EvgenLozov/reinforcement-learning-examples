@@ -1,9 +1,6 @@
 package com.example.gridworld;
 
-import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
 
 class State {
 
@@ -14,11 +11,10 @@ class State {
     static final int COLUMNS = 4;
 
     private final Position currentPosition;
-    private boolean deterministic = false;
 
     private EnumMap<Action, RandomCollection<Action>> takingActionChances;
 
-    static State startState(){
+    static State initialState(){
         return new State(2, 0);
     }
 
@@ -68,10 +64,16 @@ class State {
 
     State nextState(Action action){
 
+        //Non-deterministic means that the agent will not be able to go where it intends to go.
+        // When it takes an action, it will has a probability to crash in a different action.
         Position position = determinePosition(takingActionChances.get(action).next());
 //        Position position = determinePosition(action);
 
         return isValidPosition(position) ? new State(position) : this;
+    }
+
+    boolean isGameOver(){
+        return currentPosition.equals(WIN_POSITION) || currentPosition.equals(LOSE_POSITION);
     }
 
     private Position determinePosition(Action action) {
@@ -92,10 +94,6 @@ class State {
                 throw new IllegalArgumentException();
             }
         }
-    }
-
-    boolean isGameOver(){
-        return currentPosition.equals(WIN_POSITION) || currentPosition.equals(LOSE_POSITION);
     }
 
     private boolean isValidPosition(Position position) {

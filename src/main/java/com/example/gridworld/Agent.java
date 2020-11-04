@@ -6,21 +6,19 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Agent {
-
+class Agent {
 
     double DECAY_GAMMA = 0.9;
     double LEARNING_RATE = 0.1;
     double EXPLORATION_RATE = 0.3;
-    RandomCollection<Action> randomActions;
 
-    Stack<Pair<State, Action>> statesActions;
-    State currentState;
+    private Stack<Pair<State, Action>> statesActions;
+    private State currentState;
 
-    final Map<State, ActionsReward> qValues;
+    private Map<State, ActionsReward> qValues;
 
-    public Agent() {
-        this.currentState = State.startState();
+    Agent() {
+        this.currentState = State.initialState();
         this.statesActions = new Stack<>();
 
         this.qValues = new HashMap<>();
@@ -32,52 +30,16 @@ public class Agent {
                 qValues.put(new State(i, j), initRewards);
             }
         }
-
-        randomActions = new RandomCollection<>();
-        randomActions.add(1, Action.UP);
-        randomActions.add(1, Action.DOWN);
-        randomActions.add(1, Action.LEFT);
-        randomActions.add(1, Action.RIGHT);
-    }
-
-    Action chooseAction(){
-        if (new Random().nextDouble() <= EXPLORATION_RATE){
-            //random action
-            return randomActions.next();
-        } else {
-            //greedy action
-            return qValues.get(currentState).actionWithMaxReward();
-        }
     }
 
     void play(int rounds){
 
-        while (rounds > 0){
-            if (currentState.isGameOver()){
-                double reward = currentState.giveReward();
-                System.out.println("Round is ended, reward: " + reward);
+        while (rounds-- > 0){
 
-                // explicitly assign end state to reward values
-                double finalReward = reward;
-                qValues.put(currentState, new ActionsReward(
-                        Arrays.stream(Action.values())
-                                .collect(Collectors.toMap(Function.identity(), a -> finalReward))));
+            currentState = State.initialState();
 
-                while (!statesActions.isEmpty()){
-                    Pair<State, Action> stateAction = statesActions.pop();
-
-                    double currentQValue = qValues.get(stateAction.first).getReward(stateAction.second);
-
-                    reward = currentQValue + LEARNING_RATE * (DECAY_GAMMA * reward - currentQValue );
-                    reward = Precision.round(reward, 5);
-
-                    qValues.get(stateAction.first).put(stateAction.second, reward);
-                }
-
-                currentState = State.startState();
-                rounds--;
-
-            } else {
+            //play round
+            while (!currentState.isGameOver()){
                 Action action = chooseAction();
                 statesActions.push(new Pair<>(currentState, action));
                 System.out.println(String.format("current position {%s} action {%s}", currentState, action));
@@ -85,8 +47,49 @@ public class Agent {
                 currentState = currentState.nextState(action);
                 System.out.println("Next state: " + currentState);
             }
+
+            //back propagation reward
+            double reward = currentState.giveReward();
+            System.out.println("Round is ended, reward: " + reward);
+
+            // explicitly assign the end state to reward values
+            double finalReward = reward;
+            qValues.put(currentState, new ActionsReward(
+                    Arrays.stream(Action.values())
+                            .collect(Collectors.toMap(Function.identity(), a -> finalReward))));
+
+            while (!statesActions.isEmpty()){
+                Pair<State, Action> stateAction = statesActions.pop();
+
+                double currentQValue = qValues.get(stateAction.first).getReward(stateAction.second);
+
+                reward = currentQValue + LEARNING_RATE * (DECAY_GAMMA * reward - currentQValue );
+                reward = Precision.round(reward, 5);
+
+                qValues.get(stateAction.first).put(stateAction.second, reward);
+            }
         }
 
+    }
+
+    private Action chooseAction(){
+        if (new Random().nextDouble() <= EXPLORATION_RATE){
+            //random action
+            return getRandomAction();
+        } else {
+            //greedy action
+            return qValues.get(currentState).actionWithMaxReward();
+        }
+    }
+
+    private Action getRandomAction() {
+        RandomCollection<Action> randomActions = new RandomCollection<>();
+        randomActions.add(1, Action.UP);
+        randomActions.add(1, Action.DOWN);
+        randomActions.add(1, Action.LEFT);
+        randomActions.add(1, Action.RIGHT);
+
+        return randomActions.next();
     }
 
     void showStateValues(){
@@ -100,7 +103,5 @@ public class Agent {
             }
             System.out.println();
         }
-
     }
-
 }
