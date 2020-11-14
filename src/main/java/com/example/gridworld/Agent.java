@@ -1,5 +1,6 @@
 package com.example.gridworld;
 
+import com.example.Pair;
 import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
@@ -61,12 +62,12 @@ class Agent {
             while (!statesActions.isEmpty()){
                 Pair<State, Action> stateAction = statesActions.pop();
 
-                double currentQValue = qValues.get(stateAction.first).getReward(stateAction.second);
+                double currentQValue = qValues.get(stateAction.getFirst()).getReward(stateAction.getSecond());
 
                 reward = currentQValue + LEARNING_RATE * (DECAY_GAMMA * reward - currentQValue );
                 reward = Precision.round(reward, 5);
 
-                qValues.get(stateAction.first).put(stateAction.second, reward);
+                qValues.get(stateAction.getFirst()).put(stateAction.getSecond(), reward);
             }
         }
 

@@ -1,9 +1,9 @@
-package com.example.gridworld;
+package com.example;
 
 public class Pair<T,S> {
 
-    T first;
-    S second;
+    private final T first;
+    private final S second;
 
     public Pair(T first, S second) {
         this.first = first;
