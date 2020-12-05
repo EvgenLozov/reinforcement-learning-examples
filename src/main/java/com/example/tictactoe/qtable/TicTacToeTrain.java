@@ -1,9 +1,6 @@
 package com.example.tictactoe.qtable;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.Map;
 
 public class TicTacToeTrain {
 
@@ -24,19 +21,8 @@ public class TicTacToeTrain {
             game.play();
         }
 
-        saveToFile(playerOne.getqValues(), "playerOne.ser");
-        saveToFile(playerTwo.getqValues(), "playerTwo.ser");
+        new QTableFileStorage().save(playerOne.getqValues(), "playerOne.ser");
+        new QTableFileStorage().save(playerTwo.getqValues(), "playerTwo.ser");
 
-    }
-
-    private static void saveToFile(Map<String, Double> qValues, String fileName) throws IOException {
-        FileOutputStream fos =
-                new FileOutputStream(fileName);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(qValues);
-        oos.close();
-        fos.close();
-
-        System.out.println("Serialized HashMap data is saved in " + fileName);
     }
 }
