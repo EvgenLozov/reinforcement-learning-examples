@@ -10,17 +10,33 @@ class BotPlayer implements Player {
 
     private static final double INIT_Q_VALUE = 0.0;
 
-    double explorationRate = 0.3;
-    double learningRate = 0.1;
-    double decayGamma = 0.9;
+    private double explorationRate;
+    private double learningRate;
+    private double decayGamma;
 
-    String name;
-    int symbol;
-    Stack<String> states;
+    private String name;
+    private int symbol;
+    private Stack<String> states;
 
-    Map<String, Double> qValues;
+    private Map<String, Double> qValues;
 
-    BotPlayer(String name, int symbol, double explorationRate, double learningRate, double decayGamma) {
+    public static BotPlayer XbotPlayer(){
+        return new BotPlayer("X-Bot-Player", 1, 0.3, 0.1, 0.9);
+    }
+
+    public static BotPlayer ObotPlayer(){
+        return new BotPlayer("O-Bot-Player", -1, 0.3, 0.1, 0.9);
+    }
+
+    public static BotPlayer XbotPlayer(Map<String, Double> qValues){
+        return new BotPlayer("X-Bot-Player", 1, qValues, 0.3, 0.1, 0.9);
+    }
+
+    public static BotPlayer ObotPlayer(Map<String, Double> qValues){
+        return new BotPlayer("O-Bot-Player", -1, qValues, 0.3, 0.1, 0.9);
+    }
+
+    private BotPlayer(String name, int symbol, double explorationRate, double learningRate, double decayGamma) {
         this.name = name;
         this.symbol = symbol;
         this.explorationRate = explorationRate;
@@ -30,11 +46,10 @@ class BotPlayer implements Player {
         this.states =new Stack<>();
     }
 
-    public BotPlayer(String name, int symbol, Map<String, Double> qValues) {
-        this.name = name;
-        this.symbol = symbol;
+    private BotPlayer(String name, int symbol, Map<String, Double> qValues,
+                     double explorationRate, double learningRate, double decayGamma) {
+        this(name, symbol, explorationRate, learningRate, decayGamma);
         this.qValues = qValues;
-        this.states =new Stack<>();
     }
 
     int chooseRandomPosition(final Board board) {
@@ -89,6 +104,11 @@ class BotPlayer implements Player {
 
     public void addState(String state) {
         states.push(state);
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     public void feedReward(double reward){

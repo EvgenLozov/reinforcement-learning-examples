@@ -6,25 +6,32 @@ public class TicTacToeGame {
 
     Board board;
 
-    Player playerOne;
-    Player playerTwo;
+    Player playerX;
+    Player playerO;
 
-    public TicTacToeGame(Player playerOne, Player playerTwo) {
-        this.playerOne = playerOne;
-        this.playerTwo = playerTwo;
+    public TicTacToeGame(Player playerX, Player playerO) {
+        if (playerX.getSymbol() != 1){
+            throw new IllegalArgumentException("PlayerX has wrong symbol. Must be 1.");
+        }
+        if (playerO.getSymbol() != -1){
+            throw new IllegalArgumentException("PlayerO has wrong symbol. Must be -1.");
+        }
+        this.playerX = playerX;
+        this.playerO = playerO;
     }
 
     public void play() {
+        System.out.println("TicTacToe game. " + playerX.getName() + " plays with " + playerO.getName());
 
         board = new Board();
-        playerOne.clearStates();
-        playerTwo.clearStates();
+        playerX.clearStates();
+        playerO.clearStates();
 
         while (!isEnd()) {
 
-            System.out.println("Player One turn:");
+            System.out.println("Player X turn:");
 
-            turn(playerOne);
+            turn(playerX);
             board.print();
 
             Optional<Integer> winner = board.getWinner();
@@ -34,9 +41,9 @@ public class TicTacToeGame {
                 break;
             }
 
-            System.out.println("Player Two turn:");
+            System.out.println("Player O turn:");
 
-            turn(playerTwo);
+            turn(playerO);
             board.print();
 
             winner = board.getWinner();
@@ -57,20 +64,20 @@ public class TicTacToeGame {
         board.occupyPosition(player.getSymbol(), position);
         player.addState(board.getHash());
 
-        System.out.println("Player " + player.getSymbol() + " takes position : " + position);
+//        System.out.println("Player " + player.getSymbol() + " takes position : " + position);
     }
 
     private void giveReward() {
         board.getWinner().ifPresent( winner -> {
             if (winner == 1) {
-                playerOne.feedReward(1);
-                playerTwo.feedReward(0);
+                playerX.feedReward(1);
+                playerO.feedReward(0);
             } else if (winner == -1) {
-                playerOne.feedReward(0);
-                playerTwo.feedReward(1);
+                playerX.feedReward(0);
+                playerO.feedReward(1);
             } else {
-                playerOne.feedReward(0.5);
-                playerTwo.feedReward(0.5);
+                playerX.feedReward(0.5);
+                playerO.feedReward(0.5);
             }
         });
     }

@@ -100,7 +100,7 @@ public class Board {
                     .append(integers.get(1)).append(" | ")
                     .append(integers.get(2)).append(" | ");
 
-            System.out.println(sb.toString());
+            System.out.println(sb.toString().replace("-1", "Y").replace("1", "X"));
             System.out.println("---------------");
         }
     }

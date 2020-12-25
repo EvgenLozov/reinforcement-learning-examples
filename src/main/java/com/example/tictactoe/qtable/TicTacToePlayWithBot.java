@@ -1,18 +1,17 @@
 package com.example.tictactoe.qtable;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class TicTacToePlayWithBot {
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) {
 
-        Map<String, Double> qValues = new QTableFileStorage().load("playerTwo.ser");
+        Map<String, Double> qValues = new QTableFileStorage().load("playerO.ser");
 
-        Player human = new HumanPlayer(1);
-        BotPlayer botOne = new BotPlayer("botOne", -1, qValues);
+        Player human = HumanPlayer.XhumanPlayer();
+        BotPlayer bot = BotPlayer.ObotPlayer(qValues);
 
-        TicTacToeGame game = new TicTacToeGame(human, botOne);
+        TicTacToeGame game = new TicTacToeGame(human, bot);
         game.play();
 
     }

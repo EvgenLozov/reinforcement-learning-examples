@@ -2,6 +2,7 @@ package com.example.tictactoe.qtable;
 
 import com.example.Pair;
 import com.google.common.collect.Lists;
+import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -9,6 +10,10 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
+import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -27,21 +32,21 @@ import java.util.stream.IntStream;
 public class QTableToNN {
 
     public static final int BATCH_SIZE = 32;
-    public static final int EPOCHS = 50;
+    public static final int EPOCHS = 500;
 
     public static void main(String[] args) throws IOException {
-        String modelFile = "modelOne.bin";
-        String qTableFile = "playerOne.ser";
+        String modelFile = "modelX.bin";
+        String qTableFile = "playerX.ser";
 
         Map<String, Double> qTable = new QTableFileStorage().load(qTableFile);
 
         MultiLayerNetwork model = new MultiLayerNetwork(getNetworkConfig());
         model.init();
 
-//        UIServer uiServer = UIServer.getInstance();
-//        StatsStorage ganStatsStorage = new InMemoryStatsStorage();
-//        uiServer.attach(ganStatsStorage);
-//        model.setListeners(new StatsListener( ganStatsStorage, 20));
+        UIServer uiServer = UIServer.getInstance();
+        StatsStorage ganStatsStorage = new InMemoryStatsStorage();
+        uiServer.attach(ganStatsStorage);
+        model.setListeners(new StatsListener( ganStatsStorage, 20));
 
         IntStream.range(0, EPOCHS)
                 .mapToObj(i -> new ArrayList<>(qTable.keySet()))
@@ -78,9 +83,9 @@ public class QTableToNN {
 
                 });
 
-//        ModelSerializer.writeModel(model, modelFile, true);
-
-//        uiServer.stop();
+        ModelSerializer.writeModel(model, modelFile, true);
+//
+        UIServer.stopInstance();
     }
 
     private static MultiLayerConfiguration getNetworkConfig() {
@@ -90,8 +95,8 @@ public class QTableToNN {
                 .updater(new Sgd(0.01))
                 .l2(0.0001)
                 .list()
-                .layer(new DenseLayer.Builder().nIn(18).nOut(9).build())
-                .layer(new DenseLayer.Builder().nIn(9).nOut(3).build())
+                .layer(new DenseLayer.Builder().nIn(18).nOut(64).build())
+                .layer(new DenseLayer.Builder().nIn(64).nOut(3).build())
                 .layer(new OutputLayer.Builder(
                         LossFunctions.LossFunction.SQUARED_LOSS).activation(Activation.IDENTITY)
                         .nIn(3).nOut(1).build())

@@ -5,9 +5,19 @@ import java.util.stream.Collectors;
 
 class HumanPlayer implements Player {
 
+    private String name;
     private final int symbol;
 
-    HumanPlayer(int symbol) {
+    static HumanPlayer XhumanPlayer(){
+        return new HumanPlayer("X-Human-player", 1);
+    }
+
+    static HumanPlayer OhumanPlayer(){
+        return new HumanPlayer("O-Human-player", -1);
+    }
+
+    private HumanPlayer(String name, int symbol) {
+        this.name = name;
         this.symbol = symbol;
     }
 
@@ -32,6 +42,11 @@ class HumanPlayer implements Player {
     @Override
     public int getSymbol() {
         return symbol;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
